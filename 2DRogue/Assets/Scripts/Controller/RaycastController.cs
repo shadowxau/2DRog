@@ -7,6 +7,7 @@ public class RaycastController : MonoBehaviour {
     public LayerMask solidCollisionMask;
     public LayerMask enemyCollisionMask;
     public LayerMask triggerCollisionMask;
+    public LayerMask shotCollisionMask;
 
     public const float skinWidth = .015f;                                                                                                               // Ray inset amount
     public int horRayCount = 4;

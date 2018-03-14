@@ -18,6 +18,8 @@ TagManager:
   - BottomSpawn
   - LeftSpawn
   - TopSpawn
+  - Enemy
+  - PlayerShot
   layers:
   - Default
   - TransparentFX
@@ -31,7 +33,7 @@ TagManager:
   - NPC
   - Enemy
   - Trigger
-  - 
+  - Shot
   - 
   - 
   - 

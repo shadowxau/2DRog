@@ -73,17 +73,14 @@ public class EnemyController2D : RaycastController
             Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;                          // if moving down start rays from bottom left otherwise if moving up start rays from top left
             rayOrigin += Vector2.up * (horRaySpacing * i);
             Debug.DrawRay(rayOrigin, Vector2.right * dirX * rayLength, Color.green);
-
-            /*
+            
             #region enemyHit
             RaycastHit2D enemyHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, enemyCollisionMask);
             if (enemyHit)
             {
                 CheckObjectCollisions(enemyHit);
             }
-
             #endregion
-            */
 
             #region triggerHit
             RaycastHit2D triggerHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, triggerCollisionMask);
@@ -137,7 +134,6 @@ public class EnemyController2D : RaycastController
                 }
             }
             #endregion
-
         }
         #endregion
 
@@ -344,12 +340,12 @@ public class EnemyController2D : RaycastController
         */
 
         // check if this object has hit a collision object with the PlayerAttack tag
-        if (hit.collider.gameObject.tag == "PlayerAttack")
+        if (hit.collider.gameObject.tag == "PlayerShot")
         {
-            Debug.Log(gameObject.ToString() + " hit PlayerAttack object: " + hit.collider.gameObject.ToString());
+            Debug.Log(gameObject.ToString() + " hit PlayerShot object: " + hit.collider.gameObject.ToString());
             collisions.collidedWith = hit.collider.gameObject;
             collisions.touchPlayerAttack = true;
-            collisions.hitDir = hit.collider.GetComponent<HitCollider>().hitBoxDir;
+            collisions.hitDir = hit.collider.GetComponent<playerShotScript>().moveDirX;
             return true;
         }
 

@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class playerShotScript : MonoBehaviour {
 
-    public Vector3 velocity { get; set; }
+    public Vector2 velocity { get; set; }
     public int moveDirX = 1;
     public float moveSpeed = 2.0f;
+    public float shotTimer = 2.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -16,9 +17,22 @@ public class playerShotScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        velocity = new Vector2(moveSpeed * Time.deltaTime * moveDirX, 0);
+        if (shotTimer > 0)
+        { 
+            // Calculate the velocity
+            velocity = new Vector2(moveSpeed * Time.deltaTime * moveDirX, 0);
 
-        //Move the object
-        transform.Translate(velocity);
+            //Move the shot
+            transform.Translate(velocity);
+
+            // Reduce the shot timer
+            shotTimer -= Time.deltaTime;
+        }
+        else
+        {
+            // Destroy shot after X period of time
+            Destroy(this.gameObject);
+        }
+    
     }
 }

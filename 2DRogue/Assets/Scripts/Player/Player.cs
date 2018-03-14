@@ -245,6 +245,8 @@ public class Player : MonoBehaviour {
                 Debug.Log("playerAttacking = true");
 
                 GameObject newShot = Instantiate(playerShot, playerShotSocket.transform.position, transform.rotation);
+                newShot.GetComponent<playerShotScript>().moveDirX = playerController.collisions.facingDir;
+
 
                 /* Melee Based attack
                 // Create an invisible collider in front of the player to check for collision with another interactable object
