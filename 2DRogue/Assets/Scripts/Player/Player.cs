@@ -117,6 +117,8 @@ public class Player : MonoBehaviour {
     private float attackLocationX = 2.0f;
 
     public Vector2 attackHitBoxPos { get; set; }            // used to set the player melee hitbox position
+
+    public GameObject playerShotSocket;                     
     public Vector2 playerShotPos { get; set; }              // used to set the player shot position
 
     bool playerIsHit = false;
@@ -242,7 +244,7 @@ public class Player : MonoBehaviour {
                 playerAttacking = true;
                 Debug.Log("playerAttacking = true");
 
-                GameObject newShot = Instantiate(playerShot, new Vector3(playerShotPos.x, playerShotPos.y), transform.rotation);
+                GameObject newShot = Instantiate(playerShot, playerShotSocket.transform.position, transform.rotation);
 
                 /* Melee Based attack
                 // Create an invisible collider in front of the player to check for collision with another interactable object

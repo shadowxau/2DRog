@@ -11,6 +11,21 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1982378639985982}
   m_IsPrefabParent: 1
+--- !u!1 &1481826532099526
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4576994109369026}
+  m_Layer: 0
+  m_Name: ShotSocket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1982378639985982
 GameObject:
   m_ObjectHideFlags: 0
@@ -34,6 +49,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!4 &4576994109369026
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1481826532099526}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.42, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4986353292602280}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4986353292602280
 Transform:
   m_ObjectHideFlags: 1
@@ -43,7 +71,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.2100925, y: -3.4200065, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 0}
-  m_Children: []
+  m_Children:
+  - {fileID: 4576994109369026}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -149,9 +178,9 @@ MonoBehaviour:
   knockBackX: 15
   knockBackY: 8
   defaultAttackTimer: 0.4
-  playerAttackHitBox: {fileID: 1019532633342990, guid: acc8362fb235a9c46b2da0dfc8a070c9,
-    type: 2}
+  playerShot: {fileID: 1333865450483486, guid: 53a8f8bade12f0a459bfeb3439e46413, type: 2}
   attackLocationX: 1.2
+  playerShotSocket: {fileID: 1481826532099526}
   defaultHitTimer: 0.5
 --- !u!114 &114572651795119482
 MonoBehaviour:
@@ -178,6 +207,7 @@ MonoBehaviour:
   thisObject: {fileID: 1982378639985982}
   animator: {fileID: 95161122902440320}
   controller: {fileID: 114348676396546758}
+  enemyController: {fileID: 0}
 --- !u!114 &114784988718391486
 MonoBehaviour:
   m_ObjectHideFlags: 1
