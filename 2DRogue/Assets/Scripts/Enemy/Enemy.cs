@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Controller2D))]
+[RequireComponent(typeof(EnemyController2D))]
 public class Enemy : MonoBehaviour
 {
     public bool enemyIsHit;
@@ -30,6 +30,7 @@ public class Enemy : MonoBehaviour
     float velocityXSmoothing;
     float maxJumpVelocity;
     float minJumpVelocity;
+    public float maxFallVelocity;
 
     public int facingDirX { get; set; }
 
@@ -41,7 +42,7 @@ public class Enemy : MonoBehaviour
     public bool enemyAttacking { get; set; }
 
     public Vector2 directionalInput { get; set; }
-    public Controller2D enemyController;
+    public EnemyController2D enemyController;
 
     public bool enemyCanMove;
     public SpriteRenderer enemySprite;
@@ -54,6 +55,7 @@ public class Enemy : MonoBehaviour
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(jumpSpeed, 2);                  // calculate gravity
         maxJumpVelocity = Mathf.Abs(gravity) * jumpSpeed;                          // calculate jumpVelocity
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);       // calculate jumpVelocity
+        maxFallVelocity = maxJumpVelocity;
 
         enemyCanvas.SetActive(false);
 
@@ -96,6 +98,13 @@ public class Enemy : MonoBehaviour
         if (!enemyController.collisions.below && !enemyController.collisions.above && !enemyController.collisions.left && !enemyController.collisions.right)
         {
             enemyJumping = true;
+
+            if (velocity.y < -maxFallVelocity)
+            {
+                Vector3 v = velocity;
+                v.y = -maxFallVelocity;
+                velocity = v;
+            }
         }
 
 
@@ -198,4 +207,32 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    // used to display debug info on screen during development
+    void OnGUI()
+    {
+        GUI.Label(new Rect(10, 10, 200, 20), "Velocity X: " + velocity.x.ToString());
+        GUI.Label(new Rect(10, 24, 200, 20), "Velocity Y: " + velocity.y.ToString());
+        //GUI.Label(new Rect(10, 38, 200, 20), "Item Count: " + itemCount.ToString());
+        //GUI.Label(new Rect(10, 52, 200, 20), "ViewPositionX: " + viewPosition.x.ToString());
+        //GUI.Label(new Rect(10, 66, 200, 20), "ViewPositionY: " + viewPosition.y.ToString());
+
+        //GUI.Label(new Rect(10, 80, 500, 20), "camera.transform.position" + playerCamera.transform.position);
+        //GUI.Label(new Rect(10, 94, 500, 20), "cameraBounds.RightBoundary(" + cameraBounds.RightBoundary + ")");
+        //GUI.Label(new Rect(10, 108, 500, 20), "cameraBounds.LeftBoundary(" + cameraBounds.LeftBoundary + ")");
+        //GUI.Label(new Rect(10, 122, 500, 20), "cameraBounds.TopBoundary(" + cameraBounds.TopBoundary + ")");
+        //GUI.Label(new Rect(10, 136, 500, 20), "cameraBounds.BottomBoundary(" + cameraBounds.BottomBoundary + ")");
+
+        //GUI.Label(new Rect(10, 150, 500, 20), "cameraRightPos = " + cameraRightPos);
+        //GUI.Label(new Rect(10, 164, 500, 20), "cameraLeftPos = " + cameraLeftPos);
+        //GUI.Label(new Rect(10, 178, 500, 20), "cameraTopPos = " + cameraTopPos);
+        //GUI.Label(new Rect(10, 192, 500, 20), "cameraBottomPos = " + cameraBottomPos);
+
+    }
+
+    void OnDrawGizmos()
+    {
+        // shows player hit box
+        Gizmos.color = Color.blue;
+        Gizmos.DrawCube(transform.position, new Vector3(this.gameObject.GetComponent<BoxCollider2D>().size.x, this.gameObject.GetComponent<BoxCollider2D>().size.y, 1));
+    }
 }

@@ -28,7 +28,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1230276974063346
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,11 +40,11 @@ GameObject:
   - component: {fileID: 61435786076860578}
   - component: {fileID: 114040226679342674}
   - component: {fileID: 114076838686363434}
-  - component: {fileID: 114517166752924940}
   - component: {fileID: 212295536881840514}
   - component: {fileID: 114848781933497794}
   - component: {fileID: 95691777706093124}
   - component: {fileID: 114650489657482142}
+  - component: {fileID: 114318641131182936}
   m_Layer: 10
   m_Name: EnemyTest
   m_TagString: Enemy
@@ -76,7 +76,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1230276974063346}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.41493464, y: -3.0559337, z: 0}
+  m_LocalPosition: {x: 3.4750314, y: -4.266728, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224268475226601186}
@@ -98,15 +98,15 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.625, y: 0.6666667}
+    newSize: {x: 0.875, y: 1}
+    adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6, y: 0.65}
+  m_Size: {x: 0.6, y: 0.6}
   m_EdgeRadius: 0
 --- !u!95 &95691777706093124
 Animator:
@@ -141,7 +141,7 @@ MonoBehaviour:
     m_Bits: 256
   enemyCollisionMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   triggerCollisionMask:
     serializedVersion: 2
     m_Bits: 2048
@@ -173,13 +173,14 @@ MonoBehaviour:
   enemyDialog: 
   enemyText: {fileID: 0}
   enemyCanvas: {fileID: 1021958369877008}
-  maxJumpHeight: 4
-  minJumpHeight: 1
+  maxJumpHeight: 3
+  minJumpHeight: 0.5
   jumpSpeed: 0.4
   accelerationSpeedAir: 0.2
   accelerationSpeedGround: 0.1
-  moveSpeed: 1
+  moveSpeed: 2
   knockBack: {x: 15, y: 6}
+  maxFallVelocity: 10
   enemyController: {fileID: 114040226679342674}
   enemyCanMove: 1
   enemySprite: {fileID: 212295536881840514}
@@ -239,6 +240,24 @@ MonoBehaviour:
   m_Text: 'blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah
     blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah
     blah blah blah blah blah '
+--- !u!114 &114318641131182936
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1230276974063346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 118fda0cc8d88b847a5d98620db1beee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  topEdge: 0
+  bottomEdge: 0
+  leftEdge: 0
+  rightEdge: 0
+  vertBuffer: 12
+  horBuffer: 0.5
+  camDistance: 0
 --- !u!114 &114431241600650916
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -255,28 +274,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &114517166752924940
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1230276974063346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fa260c180038344ca8be08bd7ac7aa6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NPCIsTalking: 0
-  talkTimer: 2
-  NPCDialog: grr
-  NPCText: {fileID: 114212324035125634}
-  NPCCanvas: {fileID: 1021958369877008}
-  maxJumpHeight: 4
-  minJumpHeight: 1
-  jumpSpeed: 0.4
-  accelerationSpeedAir: 0.2
-  accelerationSpeedGround: 0.1
-  moveSpeed: 6
 --- !u!114 &114650489657482142
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -288,12 +285,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aed5d9d8175866b49b08e05e3f02f714, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AIMoveType: 0
+  AIMoveType: 2
   localWaypoints:
   - {x: 6.5, y: 0, z: 0}
   - {x: -6.36, y: 0, z: 0}
   isCyclic: 0
-  waitTime: 0
+  timeToWait: 1
+  timeToMove: 2
 --- !u!114 &114848781933497794
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -342,15 +340,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300024, guid: aba71d1dca91c394589585f461b31fe4, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.875, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
 --- !u!222 &222872274573330062
 CanvasRenderer:

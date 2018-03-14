@@ -3,7 +3,21 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Checkpoint
+  - Solid
+  - RoomController
+  - Item
+  - RightSpawn
+  - Attack
+  - Through
+  - PlayerSpawn
+  - Door
+  - Hazard
+  - NPC
+  - BottomSpawn
+  - LeftSpawn
+  - TopSpawn
   layers:
   - Default
   - TransparentFX
@@ -13,10 +27,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Solid
+  - NPC
+  - Enemy
+  - Trigger
   - 
   - 
   - 

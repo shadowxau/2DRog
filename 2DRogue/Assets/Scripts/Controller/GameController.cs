@@ -78,68 +78,17 @@ public class GameController : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        
-        // find checkpoint if none are set
-        if (currentCheckpoint == null && activePlayer == null)
-        {
-            switch (spawnDir)
-            {
-                // player exits from left, enters from right
-                case 0:
-                    SpawnPlayerFromRight();
-                    break;
-                // player exits from right, enters from left
-                case 1:
-                    SpawnPlayerFromLeft();
-                    break;
-                // player exits from top, enters from bottom
-                case 2:
-                    SpawnPlayerFromBottom();
-                    break;
-                // player exits from bottom, enters from top
-                case 3:
-                    SpawnPlayerFromTop();
-                    break;
-            }
-        }
-        else if (activePlayer == null)
+        //SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (activePlayer == null)
         {
             SpawnPlayerFromCheckPoint();
         }
-	}
-
-    
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        CheckItemRemove();
-        CheckDoorOpen();
-    }
+	} 
 
     public void CollectItemsUpdate(string itemName)
     {
         collectedItems.Add(itemName);
-    }
-
-    public void CheckItemRemove()
-    {
-        foreach (string j in collectedItems)
-        {
-            Destroy(GameObject.Find(j));
-        }
-    }
-
-    public void CheckDoorOpen()
-    {
-        foreach(string doorName in openedDoors)
-        {
-            if (GameObject.Find(doorName))
-            {
-                DoorController door = GameObject.Find(doorName).GetComponent<DoorController>();
-
-                door.startingPos = DoorController.StartingPos.open;
-            }
-        }
     }
 
     public void NextScene(string nextScene, int doorDirection)
@@ -237,9 +186,11 @@ public class GameController : MonoBehaviour {
 
     void SpawnPlayer(GameObject spawnPoint)
     {
+        /*   // Disabled for now
         // move the camera before spawning the player to prevent the scene changing again
         Vector2 cameraPos = spawnPoint.transform.position;
         ProCamera2D.Instance.MoveCameraInstantlyToPosition(cameraPos);
+        */
 
         activePlayer = null;
         activePlayer = (GameObject)Instantiate(playerObject, spawnPoint.transform.position, Quaternion.identity);
@@ -264,8 +215,10 @@ public class GameController : MonoBehaviour {
                 break;
         }
 
+        /* // Disabled for now
         ProCamera2D.Instance.Reset(true, true, true);
         ProCamera2D.Instance.CenterOnTargets();
+        */
 
         // reset room controller
         currentRoomControl = GameObject.FindGameObjectWithTag("RoomController").GetComponent<RoomController>();

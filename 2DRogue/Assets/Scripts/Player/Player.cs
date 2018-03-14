@@ -74,6 +74,7 @@ public class Player : MonoBehaviour {
     float gravity;
     float maxJumpVelocity;
     float minJumpVelocity;
+    float maxFallVelocity;
 
     public Vector3 velocity { get; set; }
 
@@ -109,12 +110,15 @@ public class Player : MonoBehaviour {
     float cameraTopPos; 
     float cameraBottomPos;
 
-    public GameObject playerAttackHitBox;
+    //public GameObject playerAttackHitBox;
+    public GameObject playerShot;
 
     [SerializeField][Range(increment, 10f)]
     private float attackLocationX = 2.0f;
 
-    public Vector2 attackHitBoxPos { get; set; }
+    public Vector2 attackHitBoxPos { get; set; }            // used to set the player melee hitbox position
+    public Vector2 playerShotPos { get; set; }              // used to set the player shot position
+
     bool playerIsHit = false;
     float playerHitTimer;
 
@@ -127,9 +131,9 @@ public class Player : MonoBehaviour {
     void Start()
     {
         playerCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        cameraBounds = playerCamera.GetComponent<ProCamera2DNumericBoundaries>();
+        //cameraBounds = playerCamera.GetComponent<ProCamera2DNumericBoundaries>();
 
-        ProCamera2D.Instance.AddCameraTarget(transform, 1f, 1f, 0f);
+        //ProCamera2D.Instance.AddCameraTarget(transform, 1f, 1f, 0f);
 
         wallJumpUp = new Vector2(wallJumpUpX, wallJumpUpY);
         wallJumpDown = new Vector2(wallJumpDownX, wallJumpDownY);
@@ -138,6 +142,7 @@ public class Player : MonoBehaviour {
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(jumpSpeed, 2);                  // calculate gravity
         maxJumpVelocity = Mathf.Abs(gravity) * jumpSpeed;                          // calculate jumpVelocity
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);       // calculate jumpVelocity
+        maxFallVelocity = maxJumpVelocity;                                          // calculate maxFallVelocity (maybe revisit / provide inspector modifier)
 
         playerCanMove = true;
         playerIsDead = false;
@@ -187,6 +192,13 @@ public class Player : MonoBehaviour {
         if (!playerController.collisions.below && !playerController.collisions.above && !playerController.collisions.left && !playerController.collisions.right)
         {
             playerJumping = true;
+
+            if (velocity.y < -maxFallVelocity)
+            {
+                Vector3 v = velocity;
+                v.y = -maxFallVelocity;
+                velocity = v;
+            }
         }
 
         CheckTouchItem();
@@ -194,7 +206,7 @@ public class Player : MonoBehaviour {
         CheckForDamageCollision();
         CheckTouchCheckpoint();
         CheckTouchNPC();
-        CheckRoomPos();
+        // CheckRoomPos();
         CheckRespawn();
         CheckTimers();
     }
@@ -230,12 +242,16 @@ public class Player : MonoBehaviour {
                 playerAttacking = true;
                 Debug.Log("playerAttacking = true");
 
+                GameObject newShot = Instantiate(playerShot, new Vector3(playerShotPos.x, playerShotPos.y), transform.rotation);
+
+                /* Melee Based attack
                 // Create an invisible collider in front of the player to check for collision with another interactable object
                 GameObject newHitBox = Instantiate(playerAttackHitBox, new Vector3(attackHitBoxPos.x, attackHitBoxPos.y), transform.rotation);
                 HitCollider hitBox = newHitBox.GetComponent<HitCollider>();
-
+                
                 hitBox.hitBoxOwner = gameObject;
                 hitBox.hitBoxDir = playerController.collisions.facingDir;
+                */
 
                 attackTimer = defaultAttackTimer;
             }
@@ -465,12 +481,13 @@ public class Player : MonoBehaviour {
         }
     }
 
+    /*  // Redundant for now
     // checks if player moves to edge of screen then loads next scene
     void CheckRoomPos()
     {    
         viewPosition = playerCamera.WorldToViewportPoint(transform.position);
 
-        ProCamera2DNumericBoundaries cameraBounds = playerCamera.GetComponent<ProCamera2DNumericBoundaries>();
+        //ProCamera2DNumericBoundaries cameraBounds = playerCamera.GetComponent<ProCamera2DNumericBoundaries>();
 
         vertExtent = playerCamera.orthographicSize;
         horzExtent = vertExtent * Screen.width / Screen.height;
@@ -488,7 +505,7 @@ public class Player : MonoBehaviour {
         Debug.Log("cameraBottomPos = " + cameraBottomPos);
         Debug.Log("cameraTopPos = " + cameraTopPos);
         */
-
+/*
         if (viewPosition.x > 1.01f)
         {
             // move right
@@ -572,6 +589,7 @@ public class Player : MonoBehaviour {
             }
         }
     }
+*/
 
     // chceks if player needs to be respawned and takes appropriate action
     void CheckRespawn()

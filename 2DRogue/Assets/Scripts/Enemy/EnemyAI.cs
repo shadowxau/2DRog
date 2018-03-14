@@ -8,7 +8,9 @@ public class EnemyAI : MonoBehaviour {
 
     public enum MoveType
     {
-        MoveBetweenPoints,
+        ConstantMovement,
+        LerpBetweenPoints,
+        MoveForTime,
         Chase,
         Flee
     }
@@ -19,12 +21,15 @@ public class EnemyAI : MonoBehaviour {
     Vector3[] globalWaypoints;
 
     public bool isCyclic;
-    public float waitTime;
+    public float timeToWait = 1.0f;
+    public float timeToMove = 2.0f;
 
     int fromWaypointIndex;
     float percentBetweenWaypoints;
-    float nextMoveTime;
+    float waitTimer = 0.0f;
+    float moveTimer = 0.0f;
 
+    int movementDir = 1;
 
     // Use this for initialization
     void Start () {
@@ -39,17 +44,50 @@ public class EnemyAI : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (AIMoveType == MoveType.MoveBetweenPoints)
+		if (AIMoveType == MoveType.LerpBetweenPoints)
         {
-            Vector2 directionalInput = CalculateEnemyMove();
+            Vector2 directionalInput = CalculateEnemyMoveBetweenPoints();
+            enemy.SetDirectionalInput(directionalInput);
+        }
+
+        if (AIMoveType == MoveType.MoveForTime)
+        {
+            Vector2 directionalInput = CalculateEnemyMoveOverTime();
+            enemy.SetDirectionalInput(directionalInput);
+        }
+        if (AIMoveType == MoveType.ConstantMovement)
+        {
+            Vector2 directionalInput = CalculateConstantMove();
             enemy.SetDirectionalInput(directionalInput);
         }
 	}
 
-
-    Vector3 CalculateEnemyMove()
+    Vector2 CalculateConstantMove()
     {
-        if (Time.time < nextMoveTime)
+        return new Vector2(movementDir, 0);
+    }
+
+    Vector2 CalculateEnemyMoveOverTime()
+    {
+        if (Time.time < waitTimer)
+        {
+            return Vector2.zero;    // don't move
+        }
+    
+        if (Time.time >= moveTimer)
+        {
+            movementDir = -movementDir;
+            waitTimer = Time.time + timeToWait;
+            moveTimer = Time.time + timeToWait + timeToMove;
+        }
+
+        return new Vector2(movementDir, 0);
+    }
+
+
+    Vector3 CalculateEnemyMoveBetweenPoints()
+    {
+        if (Time.time < waitTimer)
         {
             return Vector3.zero;                                                //stop moving
         }
@@ -76,7 +114,7 @@ public class EnemyAI : MonoBehaviour {
                     System.Array.Reverse(globalWaypoints);
                 }
             }
-            nextMoveTime = Time.time + waitTime;                                // reset move timer
+            waitTimer = Time.time + timeToWait;                                // reset move timer
         }
 
         return newPos - transform.position;
