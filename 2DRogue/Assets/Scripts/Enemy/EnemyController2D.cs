@@ -143,8 +143,7 @@ public class EnemyController2D : RaycastController
             Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;                          // if moving down start rays from bottom left otherwise if moving up start rays from top left
             rayOrigin += Vector2.up * (horRaySpacing * i);
             Debug.DrawRay(rayOrigin, Vector2.right * dirX * rayLength, Color.green);
-
-            /*
+            
             #region enemyHit
             RaycastHit2D enemyHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, enemyCollisionMask);
             if (enemyHit)
@@ -152,8 +151,7 @@ public class EnemyController2D : RaycastController
                 CheckObjectCollisions(enemyHit);
             }
             #endregion
-            */
-
+            
             #region triggerHit
             RaycastHit2D triggerHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, triggerCollisionMask);
             if (triggerHit)
@@ -339,24 +337,32 @@ public class EnemyController2D : RaycastController
         }
         */
 
-        // check if this object has hit a collision object with the PlayerAttack tag
+        // check if this object has hit a collision object with the PlayerShot tag
         if (hit.collider.gameObject.tag == "PlayerShot")
         {
             Debug.Log(gameObject.ToString() + " hit PlayerShot object: " + hit.collider.gameObject.ToString());
             collisions.collidedWith = hit.collider.gameObject;
-            collisions.touchPlayerAttack = true;
-            collisions.hitDir = hit.collider.GetComponent<playerShotScript>().moveDirX;
+            collisions.touchPlayerShot = true;
+
+            playerShotScript shot = hit.collider.GetComponent<playerShotScript>();
+            collisions.stunLockTime = shot.stunLockTime;
+            collisions.hitDir = shot.moveDirX;
+            if (!shot.isPiercing)
+            {
+                Destroy(hit.collider.gameObject);
+            }
             return true;
         }
 
-        // check if this object has hit a collision object with the Attack tag
-        if (hit.collider.gameObject.tag == "Attack")
+        // check if this object has hit a collision object with the Player tag
+        if (hit.collider.gameObject.tag == "Player")
         {
-            Debug.Log(gameObject.ToString() + " hit Attack object: " + hit.collider.gameObject.ToString());
+            Debug.Log(gameObject.ToString() + " hit Player object: " + hit.collider.gameObject.ToString());
             collisions.collidedWith = hit.collider.gameObject;
-            collisions.touchPlayerAttack = true;
-            collisions.hitDir = hit.collider.GetComponent<HitCollider>().hitBoxDir;
-            return true;
+            collisions.touchPlayer = true;
+
+            collisions.hitDir = GameController.gameControl.prevPlayerDirX;
+            
         }
 
         /*
@@ -482,14 +488,16 @@ public class EnemyController2D : RaycastController
         public int facingDir;
         public int hitDir;
         public bool dropDown;
+        public float stunLockTime;
 
         public bool touchItem;
         public bool touchHazard;
         public bool touchCheckpoint;
         public bool touchNPC;
         public bool touchEnemy;
-        public bool touchPlayerAttack;
+        public bool touchPlayerShot;
         public bool touchEnemyAttack;
+        public bool touchPlayer;
 
         public GameObject collidedWith;
 
@@ -510,7 +518,8 @@ public class EnemyController2D : RaycastController
             touchNPC = false;
             touchEnemy = false;
             touchEnemyAttack = false;
-            touchPlayerAttack = false;
+            touchPlayerShot = false;
+            touchPlayer = false;
 
             collidedWith = null;
         }

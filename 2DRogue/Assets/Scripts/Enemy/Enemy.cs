@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(EnemyController2D))]
+[RequireComponent(typeof(Controller2D))]
 public class Enemy : MonoBehaviour
 {
     public bool enemyIsHit;
@@ -23,7 +23,12 @@ public class Enemy : MonoBehaviour
     public float accelerationSpeedAir = .2f;
     public float accelerationSpeedGround = .1f;
     public float moveSpeed = 6;
+
+    public bool knockBackEngaged = false;
     public Vector2 knockBack;
+    public int knockBackDir;
+    public float currentKnockBackMultiplier = 1.0f;
+    public float smashKnockBackMultiplier = 3.0f;
  
     float gravity;
     public Vector3 velocity { get; set; }
@@ -41,11 +46,17 @@ public class Enemy : MonoBehaviour
     public bool enemyIsDead { get; set; }
     public bool enemyAttacking { get; set; }
 
-    public Vector2 directionalInput { get; set; }
-    public EnemyController2D enemyController;
+    public Vector2 directionalInput;
+    public Controller2D enemyController;
 
     public bool enemyCanMove;
     public SpriteRenderer enemySprite;
+
+    public bool stunLock;
+    public float stunLockTimer;
+
+    public bool smashLock;
+    
 
     // Use this for initialization
     void Start()
@@ -67,13 +78,17 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         CalculateVelocity();
         enemyController.Move(velocity * Time.deltaTime, directionalInput);
 
         if (enemyController.collisions.above || enemyController.collisions.below)
         {
-            if (enemyController.collisions.below) enemyJumping = false;
+            if (enemyController.collisions.below)
+            {
+                enemyJumping = false;
+                knockBackEngaged = false;
+                currentKnockBackMultiplier = 1.0f;
+            } 
 
             if (enemyController.collisions.slidingDownMaxSlope)
             {
@@ -88,6 +103,15 @@ public class Enemy : MonoBehaviour
                 velocity = v;
             }
         }
+
+        if (!enemyController.collisions.below)
+        {
+            if (enemyController.collisions.left || enemyController.collisions.right)
+            {
+                currentKnockBackMultiplier = 0f;
+            }
+        }
+
 
         if (!enemyController.collisions.below && numberOfJumps == 0)
         {
@@ -107,21 +131,94 @@ public class Enemy : MonoBehaviour
             }
         }
 
-
         CheckIfTalking();
-        CheckForAttackCollision();
+        CheckIfShot();
+        CheckStunLock();
+        CheckForSmash();
+        CheckForSmashedEnemyHit();
+    }
+
+    // check if the enemy has collided with another enemy that has been smashed
+    void CheckForSmashedEnemyHit()
+    {
+        if (enemyController.collisions.touchEnemy)
+        {
+            if (enemyController.collisions.collidedWith.GetComponent<Enemy>().knockBackEngaged)
+            {
+                Debug.Log(gameObject.ToString() + "has been hit by SMASHED ENEMY!:" + enemyController.collisions.collidedWith.ToString());
+                knockBackDir = enemyController.collisions.hitDir;
+
+                // Knock back enemy 
+                knockBackEngaged = true;
+                Vector3 v = velocity;
+                v.x = (knockBackDir * knockBack.x) * smashKnockBackMultiplier / 2;
+                currentKnockBackMultiplier = smashKnockBackMultiplier / 2;
+                v.y = knockBack.y * smashKnockBackMultiplier / 2;
+                velocity = v;
+                Debug.Log("velocity = " + velocity);
+
+                knockBackEngaged = false;
+                enemyController.collisions.touchEnemy = false;
+            }
+        }
+    }
+
+    // check if enemy has collided with player whilst in stun state and initiate smash
+    void CheckForSmash()
+    {
+        if (stunLock && enemyController.collisions.touchPlayer)
+        {
+            Debug.Log("Smash!");
+
+            knockBackDir = enemyController.collisions.hitDir;
+
+            // Knock back enemy 
+            knockBackEngaged = true;
+            Vector3 v = velocity;
+            v.x = (knockBackDir * knockBack.x) * smashKnockBackMultiplier;
+            currentKnockBackMultiplier = smashKnockBackMultiplier;
+            v.y = knockBack.y * smashKnockBackMultiplier;
+            velocity = v;
+            Debug.Log("velocity = " + velocity);
+
+            enemyController.collisions.touchPlayer = false;
+        }
+    }
+
+    // check if enemy is in stun lock
+    void CheckStunLock()
+    {
+        if (stunLock)
+        {
+            stunLockTimer -= Time.deltaTime;
+        }
+
+        if (stunLockTimer <= 0)
+        {
+            enemyCanMove = true;
+            stunLock = false;
+        }
     }
 
     // check if enemy has collided with player attack
-    void CheckForAttackCollision()
+    void CheckIfShot()
     {
-        if (enemyController.collisions.touchPlayerAttack)
+        
+        if (enemyController.collisions.touchPlayerShot)
         {
             if (!enemyIsHit)
             {
                 enemyIsHit = true;
                 Debug.Log("EnemyIsHit = true;");
+                
+                // enable stun lock
+                stunLock = true;
+                // set stun lock timer
+                stunLockTimer = enemyController.collisions.collidedWith.GetComponent<playerShotScript>().stunLockTime;
+                // prevent enemy from moving
+                enemyCanMove = false;
 
+                // Basic Knockback
                 int knockBackDir = enemyController.collisions.hitDir;
 
                 // Knock back enemy unless a stationary object
@@ -136,6 +233,7 @@ public class Enemy : MonoBehaviour
             }
         }
 
+
         if (enemyIsHit)
         {
             // change color/flash
@@ -149,6 +247,7 @@ public class Enemy : MonoBehaviour
                 enemyIsHit = false;
             }
         }
+        
     }
 
     // activated text if enemy is talking
@@ -178,7 +277,16 @@ public class Enemy : MonoBehaviour
 
     void CalculateVelocity()
     {
-        float targetVelocityX = directionalInput.x * moveSpeed;
+        float targetVelocityX;
+
+        if (!knockBackEngaged)
+        {
+            targetVelocityX = directionalInput.x * moveSpeed;
+        }
+        else
+        {
+            targetVelocityX = (knockBackDir * knockBack.x) * currentKnockBackMultiplier;
+        }
 
         Vector3 v = velocity;
         v.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (enemyController.collisions.below) ? accelerationSpeedGround : accelerationSpeedAir);
@@ -201,10 +309,7 @@ public class Enemy : MonoBehaviour
 
     public void SetDirectionalInput(Vector2 input)
     {
-        if (enemyCanMove)
-        {
-            directionalInput = input;
-        }
+        directionalInput = input;
     }
 
     // used to display debug info on screen during development

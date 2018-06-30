@@ -5,6 +5,7 @@ using System.Collections;
 public class RaycastController : MonoBehaviour {
 
     public LayerMask solidCollisionMask;
+    public LayerMask playerCollisionMask;
     public LayerMask enemyCollisionMask;
     public LayerMask triggerCollisionMask;
     public LayerMask shotCollisionMask;
@@ -26,11 +27,12 @@ public class RaycastController : MonoBehaviour {
 
     public virtual void Awake()
     {
-        col = GetComponent<BoxCollider2D>();
+        //col = GetComponent<BoxCollider2D>();
     }
 
     public virtual void Start()
     {
+        col = GetComponent<BoxCollider2D>();
         CalculateRaySpacing();
     }
 

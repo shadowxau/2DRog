@@ -433,18 +433,22 @@ public class Player : MonoBehaviour {
     {
         if (playerController.collisions.touchEnemyAttack || playerController.collisions.touchEnemy && !playerIsHit)
         {
-            Debug.Log("Enemy>Player collision");
+            // check if enemy is not stun locked
+            if (!playerController.collisions.collidedWith.GetComponent<Enemy>().stunLock)
+            {
+                Debug.Log("Enemy>Player collision");
 
-            int knockBackDir = playerController.collisions.facingDir;
+                int knockBackDir = playerController.collisions.facingDir;
 
-            Vector3 v = velocity;
-            v.x = knockBackDir * -knockBack.x;
-            v.y = knockBack.y;
-            velocity = v;
-            Debug.Log("velocity = " + velocity);
+                Vector3 v = velocity;
+                v.x = knockBackDir * -knockBack.x;
+                v.y = knockBack.y;
+                velocity = v;
+                Debug.Log("velocity = " + velocity);
 
-            playerIsHit = true;
-            playerHitTimer = defaultHitTimer;
+                playerIsHit = true;
+                playerHitTimer = defaultHitTimer;
+            }
         }
     }
 

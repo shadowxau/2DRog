@@ -69,9 +69,17 @@ public class Controller2D : RaycastController {
         #region check front ray
         for (int i = 0; i < horRayCount; i++)
         {
-            Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;                          // if moving down start rays from bottom left otherwise if moving up start rays from top left
+            Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomLeft : raycastOrigins.bottomRight;                          // if moving left start rays from bottom left otherwise if moving right start rays from bottom right
             rayOrigin += Vector2.up * (horRaySpacing * i);
             Debug.DrawRay(rayOrigin, Vector2.right * dirX * rayLength, Color.red);
+
+            #region playerHit
+            RaycastHit2D playerHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, playerCollisionMask);
+            if (playerHit)
+            {
+                CheckObjectCollisions(playerHit);
+            }
+            #endregion
 
             #region enemyHit
             RaycastHit2D enemyHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, enemyCollisionMask);
@@ -88,6 +96,15 @@ public class Controller2D : RaycastController {
             {
                 Debug.Log("front triggerHit = " + triggerHit.collider.name);
                 CheckObjectCollisions(triggerHit);
+            }
+            #endregion
+
+            #region shotHit
+            RaycastHit2D shotHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, shotCollisionMask);
+            if (shotHit)
+            {
+                Debug.Log("Hit by Shot");
+                CheckObjectCollisions(shotHit);
             }
             #endregion
 
@@ -141,9 +158,17 @@ public class Controller2D : RaycastController {
         #region Check Back Ray 
         for (int i = 0; i < horRayCount; i++)
         {
-            Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;                          // if moving down start rays from bottom left otherwise if moving up start rays from top left
+            Vector2 rayOrigin = (dirX == -1) ? raycastOrigins.bottomRight : raycastOrigins.bottomLeft;                          // if moving left start rays from bottom right otherwise if moving tight start rays from bottom left
             rayOrigin += Vector2.up * (horRaySpacing * i);
             Debug.DrawRay(rayOrigin, Vector2.right * dirX * rayLength, Color.red);
+
+            #region playerHit
+            RaycastHit2D playerHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, playerCollisionMask);
+            if (playerHit)
+            {
+                CheckObjectCollisions(playerHit);
+            }
+            #endregion
 
             #region enemyHit
             RaycastHit2D enemyHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, enemyCollisionMask);
@@ -159,6 +184,15 @@ public class Controller2D : RaycastController {
             {
                 Debug.Log(" back triggerHit = " + triggerHit.collider.name);
                 CheckObjectCollisions(triggerHit);
+            }
+            #endregion
+
+            #region shotHit
+            RaycastHit2D shotHit = Physics2D.Raycast(rayOrigin, Vector2.right * dirX, rayLength, shotCollisionMask);
+            if (shotHit)
+            {
+                Debug.Log("Hit by Shot");
+                CheckObjectCollisions(shotHit);
             }
             #endregion
 
@@ -215,6 +249,103 @@ public class Controller2D : RaycastController {
         float dirY = Mathf.Sign(velocity.y);                                                                                    // if moving down = -1, if moving up = +1
         float rayLength = Mathf.Abs(velocity.y) + skinWidth;
 
+        #region Check Top Rays
+        for (int i = 0; i < vertRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.topLeft;                                                                         // start rays from top left
+            rayOrigin += Vector2.right * (vertRaySpacing * i + velocity.x);
+            //DEBUG - Show Rays
+            Debug.DrawRay(rayOrigin, Vector2.up * dirY * rayLength, Color.red);
+
+            #region solidHit
+            // Check if object collided with "Solid" collision mask object
+            RaycastHit2D solidHit = Physics2D.Raycast(rayOrigin, Vector2.up * dirY, rayLength, solidCollisionMask);
+
+            // check against collidables
+            if (solidHit)
+            {
+                // check if object has hit a collision object with Through tag
+                if (solidHit.collider.tag == "Through")
+                {
+                    if (dirY == 1 || solidHit.distance == 0)
+                    {
+                        continue;
+                    }
+                    if (collisions.dropDown)
+                    {
+                        continue;
+                    }
+                    if (moveInput.y == -1)
+                    {
+                        collisions.dropDown = true;
+                        Invoke("ResetDropDown", .1f);
+                        continue;
+                    }
+                }
+
+                velocity.y = (solidHit.distance - skinWidth) * dirY;
+                rayLength = solidHit.distance;                                                                                           // reduce ray length if hit
+
+                collisions.above = dirY == 1;
+                #endregion
+            }
+        }
+        #endregion
+
+        #region Check Bottom Rays
+        for (int i = 0; i < vertRayCount; i++)
+        {
+            Vector2 rayOrigin = raycastOrigins.bottomLeft;
+
+            //Vector2 rayOrigin = (dirY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;                              // if moving down start rays from bottom left otherwise if moving up start rays from top left
+            rayOrigin += Vector2.right * (vertRaySpacing * i + velocity.x);
+            //DEBUG - Show Rays
+            Debug.DrawRay(rayOrigin, Vector2.up * dirY * rayLength, Color.red);
+
+            #region solidHit
+            // Check if object collided with "Solid" collision mask object
+            RaycastHit2D solidHit = Physics2D.Raycast(rayOrigin, Vector2.up * dirY, rayLength, solidCollisionMask);
+
+            // check against collidables
+            if (solidHit)
+            {
+                // check if object has hit a collision object with Through tag
+                if (solidHit.collider.tag == "Through")
+                {
+                    if (dirY == 1 || solidHit.distance == 0)
+                    {
+                        continue;
+                    }
+                    if (collisions.dropDown)
+                    {
+                        continue;
+                    }
+                    if (moveInput.y == -1)
+                    {
+                        collisions.dropDown = true;
+                        Invoke("ResetDropDown", .1f);
+                        continue;
+                    }
+                }
+
+                velocity.y = (solidHit.distance - skinWidth) * dirY;
+                rayLength = solidHit.distance;                                                                                           // reduce ray length if hit
+
+                if (collisions.climbingSlope)
+                {
+                    velocity.x = velocity.y / Mathf.Tan(collisions.slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(velocity.x);            // prevent jitter when hitting top of character on slope
+                }
+
+                collisions.below = dirY == -1;                                                                                      // if hit and going down then collisions.below is true
+ 
+            }
+            #endregion
+
+            // need to replicate collisions vertically (especially attacks)
+        }
+        #endregion
+
+        /*
         for (int i = 0; i < vertRayCount; i++)
         {
             Vector2 rayOrigin = (dirY == -1) ? raycastOrigins.bottomLeft : raycastOrigins.topLeft;                              // if moving down start rays from bottom left otherwise if moving up start rays from top left
@@ -260,7 +391,10 @@ public class Controller2D : RaycastController {
                 collisions.above = dirY == 1;
             }
             #endregion
+
+            // need to replicate collisions vertically (especially attacks)
         }
+        */
 
         if (collisions.climbingSlope)                                                                                               // prevent player moving inside slope where two slopes meet
         {
@@ -376,6 +510,35 @@ public class Controller2D : RaycastController {
             }
         }
 
+        // check if this object has collided with an object with PlayerShot tag
+        if (hit.collider.gameObject.tag == "PlayerShot")
+        {
+            Debug.Log(gameObject.ToString() + " hit PlayerShot object: " + hit.collider.gameObject.ToString());
+            collisions.collidedWith = hit.collider.gameObject;
+            collisions.touchPlayerShot = true;
+
+            playerShotScript shot = hit.collider.GetComponent<playerShotScript>();
+            collisions.hitDir = shot.moveDirX;
+
+            // destroy shot if not piercing
+            if (!shot.isPiercing)
+            {
+                Destroy(hit.collider.gameObject);
+            }
+
+            return true;
+        }
+
+        // check if this object has collided with a player
+        if (hit.collider.gameObject.tag == "Player")
+        {
+            Debug.Log(gameObject.ToString() + " hit Player: " + hit.collider.gameObject.ToString());
+            collisions.collidedWith = hit.collider.gameObject;
+            collisions.touchPlayer = true;
+
+            return true;
+        }
+
         return false;
     }
 
@@ -480,7 +643,9 @@ public class Controller2D : RaycastController {
         public bool touchNPC;
         public bool touchEnemy;
         public bool touchPlayerAttack;
+        public bool touchPlayerShot;
         public bool touchEnemyAttack;
+        public bool touchPlayer;
 
         public GameObject collidedWith;
 
@@ -502,6 +667,8 @@ public class Controller2D : RaycastController {
             touchEnemy = false;
             touchEnemyAttack = false;
             touchPlayerAttack = false;
+            touchPlayerShot = false;
+            touchPlayer = false;
 
             collidedWith = null;
         }

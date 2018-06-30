@@ -10,8 +10,6 @@ public class AnimControl : MonoBehaviour {
     private Animator animator;
     [SerializeField]
     private Controller2D controller;
-    [SerializeField]
-    private EnemyController2D enemyController;
 
     Player playerMain;
     Enemy enemyMain;
@@ -230,7 +228,7 @@ public class AnimControl : MonoBehaviour {
                     if (enemyMain.directionalInput.x > 0) Face(1);
                     else if (enemyMain.directionalInput.x < 0) Face(-1);
                     // change to idle anim if colliding with ground
-                    if (enemyController.collisions.below && !CheckAction()) EnterState(State.Idle);
+                    if (controller.collisions.below && !CheckAction()) EnterState(State.Idle);
                     // jump anim (double jump)
                     if (enemyMain.enemyJumping && enemyMain.velocity.y > 0) EnterState(State.Jump);
                     // change to die
@@ -244,7 +242,7 @@ public class AnimControl : MonoBehaviour {
                     // change to fall
                     if (enemyMain.velocity.y > 0 && enemyMain.enemyJumping) EnterState(State.Fall);
                     // change to idle on collision with ground
-                    if (enemyController.collisions.below && !CheckAction()) EnterState(State.Idle);
+                    if (controller.collisions.below && !CheckAction()) EnterState(State.Idle);
                     // change to die
                     if (enemyMain.enemyIsDead) EnterState(State.Die);
                     break;

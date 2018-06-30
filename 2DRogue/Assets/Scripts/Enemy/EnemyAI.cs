@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Enemy))]
 public class EnemyAI : MonoBehaviour {
 
     Enemy enemy;
@@ -16,6 +17,14 @@ public class EnemyAI : MonoBehaviour {
     }
 
     public MoveType AIMoveType;
+
+    public enum StartMoveDir
+    {
+        Left,
+        Right
+    }
+
+    public StartMoveDir StartDirection;
 
     public Vector3[] localWaypoints;
     Vector3[] globalWaypoints;
@@ -40,25 +49,43 @@ public class EnemyAI : MonoBehaviour {
         {
             globalWaypoints[i] = localWaypoints[i] + transform.position;
         }
+
+        if (StartDirection == StartMoveDir.Left)
+        {
+            movementDir = -1;
+        }
+        else if (StartDirection == StartMoveDir.Right)
+        {
+            movementDir = 1;
+        }
     }
 	
 	// Update is called once per frame
 	void Update () {
-		if (AIMoveType == MoveType.LerpBetweenPoints)
-        {
-            Vector2 directionalInput = CalculateEnemyMoveBetweenPoints();
-            enemy.SetDirectionalInput(directionalInput);
-        }
 
-        if (AIMoveType == MoveType.MoveForTime)
+        if (enemy.enemyCanMove == false)
         {
-            Vector2 directionalInput = CalculateEnemyMoveOverTime();
-            enemy.SetDirectionalInput(directionalInput);
+            enemy.SetDirectionalInput(new Vector2(0, 0));
         }
-        if (AIMoveType == MoveType.ConstantMovement)
+        else
         {
-            Vector2 directionalInput = CalculateConstantMove();
-            enemy.SetDirectionalInput(directionalInput);
+            if (AIMoveType == MoveType.LerpBetweenPoints)
+            {
+                Vector2 directionalInput = CalculateEnemyMoveBetweenPoints();
+                enemy.SetDirectionalInput(directionalInput);
+            }
+
+            if (AIMoveType == MoveType.MoveForTime)
+            {
+                Vector2 directionalInput = CalculateEnemyMoveOverTime();
+                enemy.SetDirectionalInput(directionalInput);
+            }
+
+            if (AIMoveType == MoveType.ConstantMovement)
+            {
+                Vector2 directionalInput = CalculateConstantMove();
+                enemy.SetDirectionalInput(directionalInput);
+            }
         }
 	}
 

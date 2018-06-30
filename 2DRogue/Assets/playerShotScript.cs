@@ -5,9 +5,11 @@ using UnityEngine;
 public class playerShotScript : MonoBehaviour {
 
     public Vector2 velocity { get; set; }
-    public int moveDirX = 1;
+    public int moveDirX { get; set; }
     public float moveSpeed = 2.0f;
     public float shotTimer = 2.0f;
+    public float stunLockTime = 2.0f;
+    public bool isPiercing = false;
 
 	// Use this for initialization
 	void Start () {
